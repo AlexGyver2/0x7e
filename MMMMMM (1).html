@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Часы</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+            color: #ffffff;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        .clock-container {
+            display: flex;
+            font-size: 16vw;
+            font-weight: 400;
+            letter-spacing: -2px;
+        }
+        .time-part {
+            display: inline-block;
+            padding: 0 5px;
+        }
+        .separator {
+            color: #ffffff;
+            cursor: pointer;
+            padding: 0 15px;
+        }
+        
+        /* Встроенное кастомное меню */
+        .menu-panel {
+            position: absolute;
+            bottom: -250px;
+            left: 0;
+            width: 100%;
+            background-color: #1a1a1a;
+            border-top: 2px solid #333;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            transition: bottom 0.3s ease;
+            z-index: 10;
+        }
+        .menu-panel.open {
+            bottom: 0;
+        }
+        .menu-title {
+            font-size: 16px;
+            color: #888;
+        }
+        .counter-box {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        .btn {
+            background-color: #333;
+            color: white;
+            border: none;
+            font-size: 24px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .btn:active {
+            background-color: #555;
+        }
+        .hour-val {
+            font-size: 32px;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+        .action-btn {
+            background-color: #007ff5;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 80%;
+        }
+        .action-btn.active {
+            background-color: #e53935;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="clock-container">
+        <span id="hours" class="time-part">00</span>
+        <span id="sep" class="separator" onclick="toggleMenu()">:</span>
+        <span id="minutes" class="time-part">00</span>
+    </div>
+
+    <div id="menu" class="menu-panel">
+        <div class="menu-title">Заморозить час на отметке:</div>
+        <div class="counter-box">
+            <button class="btn" onclick="changeHour(-1)">-</button>
+            <div id="hour-val" class="hour-val">09</div>
+            <button class="btn" onclick="changeHour(1)">+</button>
+        </div>
+        <button id="action-btn" class="action-btn" onclick="togglePrank()">Включить прикол</button>
+    </div>
+
+    <script>
+        let prankMode = false;
+        let fakeHour = 9;
+
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const menuEl = document.getElementById('menu');
+        const hourValEl = document.getElementById('hour-val');
+        const actionBtnEl = document.getElementById('action-btn');
+
+        function updateClock() {
+            const now = new Date();
+            const realHour = now.getHours();
+            const realMinutes = now.getMinutes();
+
+            if (!prankMode) {
+                // Обычный режим: реальное время
+                hoursEl.innerText = String(realHour).padStart(2, '0');
+                minutesEl.innerText = String(realMinutes).padStart(2, '0');
+            } else {
+                // Режим прикола: час замерз, минуты считаются математически
+                hoursEl.innerText = String(fakeHour).padStart(2, '0');
+                
+                let hourDiff = realHour - fakeHour;
+                if (hourDiff < 0) {
+                    hourDiff += 24; // Коррекция, если перешагнули через полночь
+                }
+
+                let fakeMinutes = (hourDiff * 60) + realMinutes;
+                minutesEl.innerText = String(fakeMinutes).padStart(2, '0');
+            }
+        }
+
+        // Показать или скрыть панель настроек по тапу на двоеточие
+        function toggleMenu() {
+            menuEl.classList.toggle('open');
+        }
+
+        // Изменение цифры часа кнопками + и -
+        function changeHour(amount) {
+            fakeHour += amount;
+            if (fakeHour > 23) fakeHour = 0;
+            if (fakeHour < 0) fakeHour = 23;
+            hourValEl.innerText = String(fakeHour).padStart(2, '0');
+        }
+
+        // Кнопка включения режима обмана
+        function togglePrank() {
+            prankMode = !prankMode;
+            
+            if (prankMode) {
+                actionBtnEl.innerText = "Выключить прикол";
+                actionBtnEl.classList.add('active');
+            } else {
+                actionBtnEl.innerText = "Включить прикол";
+                actionBtnEl.classList.remove('active');
+            }
+            
+            updateClock();
+            toggleMenu(); // Прячем меню
+        }
+
+        // Запуск часов. Проверка идет каждую секунду, чтобы минуты обновлялись синхронно с системой
+        hourValEl.innerText = String(fakeHour).padStart(2, '0');
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>
