@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>0x7e // Hardcore Hardware & Firmware Hub</title>
+    <!-- Подключение Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключение Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap');
@@ -13,6 +15,10 @@
         .glow-text { text-shadow: 0 0 8px rgba(20, 184, 166, 0.5); }
         .grid-bg { background-image: linear-gradient(to right, #1f293715 1px, transparent 1px), linear-gradient(to bottom, #1f293715 1px, transparent 1px); }
         
+        /* Плавная анимация выдвижной панели */
+        .drawer-transition { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        
+        /* Ограничение размеров шрифта для мобильной верстки терминала */
         .terminal-container {
             font-size: clamp(10px, 3.1vw, 13.5px);
             line-height: 1.6;
@@ -29,6 +35,7 @@
             display: none;
         }
 
+        /* Анимация критической ошибки при перезагрузке */
         @keyframes glitch-red {
             0% { background-color: #090d16; }
             10% { background-color: #991b1b; }
@@ -42,8 +49,8 @@
 </head>
 <body id="body-root" class="text-slate-300 min-h-screen flex flex-col justify-between relative selection:bg-teal-500 selection:text-slate-900 overflow-x-hidden">
 
-    <!-- Задний фон: Матричный дождь (активируется кнопкой на странице) -->
-    <canvas id="matrixCanvas" class="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-1000 z-0"></canvas>
+    <!-- Задний фон: Матричный дождь (фиксированное позиционирование fixed вместо absolute) -->
+    <canvas id="matrixCanvas" class="fixed inset-0 pointer-events-none opacity-0 transition-opacity duration-1000 z-0"></canvas>
     
     <!-- Сетка на фоне -->
     <div class="absolute inset-0 grid-bg bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_10%,#000_70%,transparent_100%)] pointer-events-none z-0"></div>
@@ -58,7 +65,13 @@
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
                     <span class="ml-2 font-mono">root@0x7e:~</span>
                 </div>
-                <div class="text-teal-500 font-bold glow-text animate-pulse">CORE NODE ONLINE</div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="openServiceDrawer()" class="text-slate-500 hover:text-teal-400 transition-colors flex items-center gap-1">
+                        <i data-lucide="sliders" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Сервис</span>
+                    </button>
+                    <span class="text-slate-800">|</span>
+                    <div class="text-teal-500 font-bold glow-text animate-pulse">CORE NODE ONLINE</div>
+                </div>
             </div>
             
             <div class="p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -78,19 +91,21 @@
             </div>
         </header>
 
-        <!-- РАЗДЕЛ 1: СТРУКТУРА ПОДДОМЕНОВ -->
+        <!-- Структура поддоменов (/www) -->
         <section class="mb-8">
             <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
                 <i data-lucide="network" class="w-5 h-5 text-teal-500"></i>
                 Структура поддоменов (/www)
             </h2>
             
+            <!-- Окно терминала с деревом -->
             <div class="border border-slate-800 rounded-xl p-4 sm:p-6 bg-black/95 font-mono shadow-xl relative overflow-hidden terminal-container">
-                <div class="absolute top-2 right-3 text-[9px] text-slate-700 select-none">tree_v1.3</div>
+                <div class="absolute top-2 right-3 text-[9px] text-slate-700 select-none">tree_v1.5</div>
                 
                 <div class="text-slate-400 mb-2">alex@0x7e.ru:~$ <span class="text-white">tree --domains /www</span></div>
                 <div class="text-slate-200 font-bold mb-1">/www</div>
                 
+                <!-- Обертка без переносов строк на мобильных -->
                 <div class="tree-wrapper space-y-1 text-slate-300">
                     <div>├── <a href="https://about.0x7e.ru" class="text-teal-400 hover:text-teal-300 hover:underline font-bold transition-all">about.0x7e.ru</a> <span class="text-slate-500">------------> [ О себе ]</span></div>
                     <div>├── <a href="https://projects.0x7e.ru" class="text-teal-400 hover:text-teal-300 hover:underline font-bold transition-all">projects.0x7e.ru</a> <span class="text-slate-500">-------> [ Проекты ]</span></div>
@@ -98,66 +113,6 @@
                     <div>├── <a href="https://blog.0x7e.ru" class="text-teal-400 hover:text-teal-300 hover:underline font-bold transition-all">blog.0x7e.ru</a> <span class="text-slate-500">------------─> [ Блог ]</span></div>
                     <div>├── <a href="https://clock.0x7e.ru" class="text-teal-400 hover:text-teal-300 hover:underline font-bold transition-all">clock.0x7e.ru</a> <span class="text-slate-500">------------> [ Часы ]</span></div>
                     <div>└── <a href="https://contacts.0x7e.ru" class="text-teal-400 hover:text-teal-300 hover:underline font-bold transition-all">contacts.0x7e.ru</a> <span class="text-slate-500">-------> [ Контакты ]</span></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- РАЗДЕЛ 2: СЛУЖЕБНАЯ КОНСОЛЬ УПРАВЛЕНИЯ (БЕЗ ПАРОЛЕЙ, НАПРЯМУЮ) -->
-        <section class="mb-8">
-            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <i data-lucide="terminal" class="w-5 h-5 text-teal-500"></i>
-                Системная консоль управления
-            </h2>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Блок Пинг-теста -->
-                <div class="border border-slate-800 rounded-xl p-5 bg-slate-950/80 backdrop-blur-md flex flex-col justify-between">
-                    <div>
-                        <div class="text-[10px] text-teal-400 font-bold tracking-widest mb-2">// NETWORK SCANNER</div>
-                        <h3 class="text-sm font-bold text-white mb-3">Замер задержки узлов (Ping)</h3>
-                        
-                        <div class="bg-black/40 rounded-lg p-3 border border-slate-900 space-y-2 font-mono text-xs">
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">0x7e.ru:</span>
-                                <span id="pingMain" class="text-slate-400">offline</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">clock.0x7e.ru:</span>
-                                <span id="pingClock" class="text-slate-400">offline</span>
-                            </div>
-                        </div>
-                    </div>
-                    <button onclick="startPingTest()" class="w-full mt-4 bg-teal-950/40 border border-teal-500/30 text-teal-400 py-2 rounded-lg text-xs font-bold hover:bg-teal-500 hover:text-slate-950 transition-all duration-300">
-                        ЗАПУСТИТЬ ТЕСТ СЕТИ
-                    </button>
-                </div>
-
-                <!-- Блок визуализации (Матрица и Сброс) -->
-                <div class="border border-slate-800 rounded-xl p-5 bg-slate-950/80 backdrop-blur-md flex flex-col justify-between">
-                    <div>
-                        <div class="text-[10px] text-teal-400 font-bold tracking-widest mb-2">// UTILITY CONSOLE</div>
-                        <h3 class="text-sm font-bold text-white mb-3">Визуализация и датчики</h3>
-                        
-                        <div class="bg-black/40 rounded-lg p-3 border border-slate-900 space-y-2 font-mono text-xs text-slate-400">
-                            <div class="flex justify-between">
-                                <span>Разрешение экрана:</span>
-                                <span id="localRes" class="text-white">...</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>Заряд батареи:</span>
-                                <span id="localBattery" class="text-white">...</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-2 mt-4">
-                        <button id="matrixToggle" onclick="toggleMatrixEffect()" class="bg-slate-900 border border-slate-800 text-slate-400 text-xs py-2 rounded-lg font-bold hover:border-teal-500 hover:text-teal-400 transition-all duration-300">
-                            ВКЛЮЧИТЬ МАТРИЦУ
-                        </button>
-                        <button onclick="triggerEmergencyReboot()" class="bg-red-950/20 border border-red-900/40 text-red-400 text-xs py-2 rounded-lg font-bold hover:bg-red-600 hover:text-white transition-all duration-300">
-                            СБРОС СИСТЕМЫ
-                        </button>
-                    </div>
                 </div>
             </div>
         </section>
@@ -215,6 +170,78 @@
         </section>
     </main>
 
+    <!-- ПЛАВАЮЩАЯ СЕРВИСНАЯ КНОПКА -->
+    <button onclick="openServiceDrawer()" class="fixed bottom-6 right-6 z-40 bg-teal-950/85 text-teal-400 border border-teal-500/40 px-4 py-2.5 rounded-full flex items-center gap-2 text-xs font-bold tracking-widest hover:bg-teal-500 hover:text-slate-950 transition-all duration-300 shadow-lg hover:shadow-teal-500/25 backdrop-blur-md">
+        <i data-lucide="wrench" class="w-4 h-4 animate-pulse"></i>
+        <span>SERVICE</span>
+    </button>
+
+    <!-- ВЫДВИЖНАЯ СЕРВИСНАЯ ПАНЕЛЬ -->
+    <div id="serviceDrawer" class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-slate-950/95 border-l border-slate-800 z-50 shadow-2xl p-6 flex flex-col justify-between drawer-transition translate-x-full backdrop-blur-md">
+        <div>
+            <!-- Шапка панели -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+                <div class="flex items-center gap-2 text-teal-400 font-bold">
+                    <i data-lucide="terminal" class="w-5 h-5"></i>
+                    <span>0x7E // SERVICE CONSOLE</span>
+                </div>
+                <button onclick="closeServiceDrawer()" class="text-slate-500 hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- Раздел 1: Диагностика пинга -->
+            <div class="space-y-4 mb-6">
+                <h3 class="text-xs font-bold text-slate-500 tracking-wider uppercase">// Сетевой пинг-сканер</h3>
+                <div class="bg-slate-900/80 rounded-lg p-4 border border-slate-800 space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span>Ping main (0x7e.ru):</span>
+                        <span id="pingMain" class="font-mono text-slate-500">offline</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span>Ping clock (clock.0x7e.ru):</span>
+                        <span id="pingClock" class="font-mono text-slate-500">offline</span>
+                    </div>
+                    <button onclick="startPingTest()" class="w-full mt-2 bg-teal-900/30 border border-teal-500/30 text-teal-400 rounded py-1.5 text-xs font-bold hover:bg-teal-500 hover:text-slate-950 transition-all">
+                        Запустить Ping-тест
+                    </button>
+                </div>
+            </div>
+
+            <!-- Раздел 2: Матричный Дождь -->
+            <div class="space-y-4 mb-6">
+                <h3 class="text-xs font-bold text-slate-500 tracking-wider uppercase">// Визуальные эффекты</h3>
+                <div class="flex items-center justify-between bg-slate-900/80 rounded-lg p-4 border border-slate-800">
+                    <div class="text-xs">
+                        <div class="font-bold">Фоновая матрица (Canvas)</div>
+                        <p class="text-[10px] text-slate-500">HEX дождь на фоне</p>
+                    </div>
+                    <button id="matrixToggle" onclick="toggleMatrixEffect()" class="bg-slate-800 border border-slate-700 text-slate-400 text-xs px-3 py-1.5 rounded font-bold hover:border-teal-500 hover:text-teal-400 transition-all">
+                        ВКЛЮЧИТЬ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Раздел 3: Системная инфа устройства -->
+            <div class="space-y-4">
+                <h3 class="text-xs font-bold text-slate-500 tracking-wider uppercase">// Локальные метаданные</h3>
+                <div class="bg-slate-900/40 rounded-lg p-4 border border-slate-900 space-y-2 text-[11px] font-mono text-slate-400">
+                    <div>RESOLUTION: <span id="localRes" class="text-slate-200">Checking...</span></div>
+                    <div>AGENT: <span id="localAgent" class="text-slate-200 truncate block">Checking...</span></div>
+                    <div>BATTERY STATUS: <span id="localBattery" class="text-slate-200">Checking...</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Раздел 4: Перезагрузка -->
+        <div class="border-t border-slate-900 pt-6">
+            <button onclick="triggerEmergencyReboot()" class="w-full bg-red-950/30 border border-red-900 text-red-500 py-3 rounded-lg text-xs font-bold hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-2">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                <span>СИМУЛИРОВАТЬ СБОЙ И REBOOT ЯДРА</span>
+            </button>
+        </div>
+    </div>
+
     <!-- Подвал -->
     <footer class="border-t border-slate-900 bg-slate-950/60 backdrop-blur-md py-5 z-10 text-xs text-slate-500 font-mono">
         <div class="max-w-4xl w-full mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
@@ -231,11 +258,21 @@
         </div>
     </footer>
 
-    <!-- JS Логика интерактивных инструментов -->
+    <!-- Логика работы страницы -->
     <script>
         lucide.createIcons();
 
-        // 1. Конвертер
+        // Открытие/закрытие панели (Drawer)
+        const drawer = document.getElementById('serviceDrawer');
+        function openServiceDrawer() {
+            drawer.classList.remove('translate-x-full');
+            updateDeviceStats();
+        }
+        function closeServiceDrawer() {
+            drawer.classList.add('translate-x-full');
+        }
+
+        // Конвертер
         const asciiInput = document.getElementById('asciiInput');
         const hexInput = document.getElementById('hexInput');
 
@@ -254,51 +291,46 @@
             try { asciiInput.value = new TextDecoder('utf-8').decode(new Uint8Array(bytes)); } catch (err) {}
         });
 
-        // 2. Сетевой Пинг-тест
+        // Пинг-тест
         function startPingTest() {
             const pMain = document.getElementById('pingMain');
             const pClock = document.getElementById('pingClock');
-            
-            pMain.innerText = 'опрос узла...';
+            pMain.innerText = 'measuring...';
             pMain.className = 'font-mono text-yellow-500 animate-pulse';
-            pClock.innerText = 'опрос узла...';
+            pClock.innerText = 'measuring...';
             pClock.className = 'font-mono text-yellow-500 animate-pulse';
 
             setTimeout(() => {
-                pMain.innerText = `${Math.floor(Math.random() * 18) + 6} ms [OK]`;
+                pMain.innerText = `${Math.floor(Math.random() * 25) + 8} ms`;
                 pMain.className = 'font-mono text-emerald-400 font-bold';
             }, 800);
-            
             setTimeout(() => {
-                pClock.innerText = `${Math.floor(Math.random() * 24) + 10} ms [OK]`;
+                pClock.innerText = `${Math.floor(Math.random() * 35) + 12} ms`;
                 pClock.className = 'font-mono text-emerald-400 font-bold';
             }, 1400);
         }
 
-        // 3. Снятие показаний устройства (Диагностика)
+        // Диагностика устройства
         function updateDeviceStats() {
-            document.getElementById('localRes').innerText = `${window.screen.width} x ${window.screen.height} px`;
-            
+            document.getElementById('localRes').innerText = `${window.screen.width}x${window.screen.height} px`;
+            document.getElementById('localAgent').innerText = navigator.userAgent;
             if (navigator.getBattery) {
                 navigator.getBattery().then(b => {
-                    document.getElementById('localBattery').innerText = `${Math.round(b.level * 100)}% (${b.charging ? 'Зарядка' : 'Автономно'})`;
+                    document.getElementById('localBattery').innerText = `${Math.round(b.level * 100)}% (${b.charging ? 'Charging' : 'Discharging'})`;
                 });
-            } else {
-                document.getElementById('localBattery').innerText = 'Не поддерживается';
-            }
+            } else { document.getElementById('localBattery').innerText = 'N/A'; }
         }
-        updateDeviceStats();
 
-        // 4. Симуляция сбоя (Экстренный сброс)
+        // Симуляция сбоя
         function triggerEmergencyReboot() {
             document.getElementById('body-root').classList.add('glitch-active');
+            closeServiceDrawer();
             setTimeout(() => {
                 document.body.innerHTML = `
                     <div class="flex flex-col items-center justify-center h-screen bg-slate-950 text-red-500 font-mono p-6">
                         <div class="max-w-md space-y-4">
                             <h1 class="text-2xl font-bold border-b border-red-900 pb-2">CRITICAL_SYSTEM_ALERT</h1>
                             <p class="text-xs">> CPU REGISTER DUMP: EAX=0x7E EBX=0x00FF4B ESP=0x7F2A3D</p>
-                            <p class="text-xs">> Flushing buffer tables...</p>
                             <p class="text-xs text-white animate-pulse">> REBOOTING SERVER NODE IN 3 SECONDS...</p>
                         </div>
                     </div>`;
@@ -306,13 +338,12 @@
             setTimeout(() => { window.location.reload(); }, 3500);
         }
 
-        // 5. Логика эффекта Матричного Дождя
+        // Эффект Матрицы
         const canvas = document.getElementById('matrixCanvas');
         const ctx = canvas.getContext('2d');
         let matrixActive = false;
         let animationFrameId;
-
-        const matrixChars = "0123456789ABCDEF0x7E~<>";
+        const matrixChars = "0123456789ABCDEF0x7E~<>[]{}";
         const charArr = matrixChars.split("");
         const fontSize = 14;
         let columns, drops;
@@ -320,50 +351,44 @@
         function initMatrix() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            columns = canvas.width / fontSize;
+            columns = Math.floor(canvas.width / fontSize) + 1;
             drops = [];
-            for (let x = 0; x < columns; x++) drops[x] = 1;
+            for (let x = 0; x < columns; x++) drops[x] = Math.random() * -100; // Разбрасываем начальную высоту капель для естественности
         }
 
         function drawMatrix() {
             ctx.fillStyle = "rgba(9, 13, 22, 0.05)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = "#14b8a6"; // Бирюзовое свечение
+            ctx.fillStyle = "#14b8a6";
             ctx.font = fontSize + "px monospace";
-
             for (let i = 0; i < drops.length; i++) {
                 const text = charArr[Math.floor(Math.random() * charArr.length)];
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
                 drops[i]++;
             }
-            if (matrixActive) {
-                animationFrameId = requestAnimationFrame(drawMatrix);
-            }
+            if (matrixActive) animationFrameId = requestAnimationFrame(drawMatrix);
         }
 
-        window.addEventListener('resize', () => { if (matrixActive) initMatrix(); });
+        // Плавное обновление размеров при переориентации смартфона
+        window.addEventListener('resize', () => { 
+            if (matrixActive) {
+                initMatrix(); 
+            }
+        });
 
         function toggleMatrixEffect() {
             matrixActive = !matrixActive;
             const btn = document.getElementById('matrixToggle');
-            
             if (matrixActive) {
-                canvas.classList.remove('opacity-0');
-                canvas.classList.add('opacity-30');
-                btn.innerText = 'ВЫКЛЮЧИТЬ МАТРИЦУ';
-                btn.className = 'bg-teal-500 border border-teal-400 text-slate-950 text-xs py-2 rounded-lg font-bold hover:bg-teal-600 transition-all duration-300';
-                initMatrix();
-                drawMatrix();
+                canvas.classList.remove('opacity-0'); canvas.classList.add('opacity-30');
+                btn.innerText = 'ВЫКЛЮЧИТЬ';
+                btn.className = 'bg-teal-500 border border-teal-400 text-slate-950 text-xs px-3 py-1.5 rounded font-bold hover:bg-teal-600 transition-all';
+                initMatrix(); drawMatrix();
             } else {
-                canvas.classList.add('opacity-0');
-                canvas.classList.remove('opacity-30');
-                btn.innerText = 'ВКЛЮЧИТЬ МАТРИЦУ';
-                btn.className = 'bg-slate-900 border border-slate-800 text-slate-400 text-xs py-2 rounded-lg font-bold hover:border-teal-500 hover:text-teal-400 transition-all duration-300';
+                canvas.classList.add('opacity-0'); canvas.classList.remove('opacity-30');
+                btn.innerText = 'ВКЛЮЧИТЬ';
+                btn.className = 'bg-slate-800 border border-slate-700 text-slate-400 text-xs px-3 py-1.5 rounded font-bold hover:border-teal-500 hover:text-teal-400 transition-all';
                 cancelAnimationFrame(animationFrameId);
                 setTimeout(() => { ctx.clearRect(0, 0, canvas.width, canvas.height); }, 1000);
             }
