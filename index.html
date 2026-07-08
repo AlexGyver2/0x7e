@@ -15,10 +15,10 @@
         .glow-text { text-shadow: 0 0 8px rgba(20, 184, 166, 0.5); }
         .grid-bg { background-image: linear-gradient(to right, #1f293715 1px, transparent 1px), linear-gradient(to bottom, #1f293715 1px, transparent 1px); }
         
-        /* Плавная анимация выдвижной панели */
+        /* Анимация выдвижного меню */
         .drawer-transition { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         
-        /* Ограничение размеров шрифта для мобильной верстки терминала */
+        /* Адаптивный шрифт для дерева папок в консоли */
         .terminal-container {
             font-size: clamp(10px, 3.1vw, 13.5px);
             line-height: 1.6;
@@ -35,7 +35,7 @@
             display: none;
         }
 
-        /* Анимация критической ошибки при перезагрузке */
+        /* Анимация сбоя */
         @keyframes glitch-red {
             0% { background-color: #090d16; }
             10% { background-color: #991b1b; }
@@ -98,14 +98,12 @@
                 Структура поддоменов (/www)
             </h2>
             
-            <!-- Окно terminal с деревом -->
             <div class="border border-slate-800 rounded-xl p-4 sm:p-6 bg-black/95 font-mono shadow-xl relative overflow-hidden terminal-container">
-                <div class="absolute top-2 right-3 text-[9px] text-slate-700 select-none">tree_v1.8</div>
+                <div class="absolute top-2 right-3 text-[9px] text-slate-700 select-none">tree_v2.0</div>
                 
                 <div class="text-slate-400 mb-2">alex@0x7e.ru:~$ <span class="text-white">tree --domains /www</span></div>
                 <div class="text-slate-200 font-bold mb-1">/www</div>
                 
-                <!-- Обертка без переносов строк на мобильных -->
                 <div class="tree-wrapper space-y-1 text-slate-300">
                     <div>├── <a href="https://about.0x7e.ru" class="text-teal-400 hover:text-teal-300 hover:underline font-bold transition-all">about.0x7e.ru</a> <span class="text-slate-500">------------> [ О себе ]</span></div>
                     <div>├── <a href="https://projects.0x7e.ru" class="text-teal-400 hover:text-teal-300 hover:underline font-bold transition-all">projects.0x7e.ru</a> <span class="text-slate-500">-------> [ Проекты ]</span></div>
@@ -117,7 +115,7 @@
             </div>
         </section>
 
-        <!-- Интерактивный HEX-конвертер -->
+        <!-- Интерактивный HEX-конвертер (используется для генерации пароля!) -->
         <section class="border border-slate-800/60 rounded-xl p-6 mb-8 bg-slate-950/40 backdrop-blur-md">
             <h2 class="text-base font-bold text-white mb-3 flex items-center gap-2">
                 <i data-lucide="binary" class="w-4 h-4 text-teal-500"></i>
@@ -133,7 +131,7 @@
             </div>
         </section>
 
-        <!-- Текущие хардварные проекты -->
+        <!-- Текущие проекты -->
         <section class="mb-8">
             <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
                 <i data-lucide="folder-git" class="w-5 h-5 text-teal-500"></i>
@@ -162,7 +160,7 @@
                     <div>
                         <div class="text-[10px] font-bold text-cyan-400 tracking-wider mb-1">#RF_MESH</div>
                         <h3 class="text-sm font-bold text-white mb-1">LoRa Antenna Tracker</h3>
-                        <p class="text-[11px] text-slate-400 leading-relaxed">Система точного автоматического наведения антенны на шаговом двигателе NEMA 17.</p>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">Система автоматического наведения антенны на шаговом двигателе NEMA 17.</p>
                     </div>
                     <div class="text-[9px] text-slate-600 mt-3 border-t border-slate-900/60 pt-2 font-mono">Meshtastic // Pico 2</div>
                 </div>
@@ -170,7 +168,7 @@
         </section>
     </main>
 
-    <!-- ПЛАВАЮЩАЯ СЕРВИСНАЯ КНОПКА (БЕЗ ПАРОЛЯ ПРИ КЛИКЕ) -->
+    <!-- ПЛАВАЮЩАЯ СЕРВИСНАЯ КНОПКА -->
     <button onclick="openServiceDrawer()" class="fixed bottom-6 right-6 z-40 bg-teal-950/85 text-teal-400 border border-teal-500/40 px-4 py-2.5 rounded-full flex items-center gap-2 text-xs font-bold tracking-widest hover:bg-teal-500 hover:text-slate-950 transition-all duration-300 shadow-lg hover:shadow-teal-500/25 backdrop-blur-md">
         <i data-lucide="wrench" class="w-4 h-4 animate-pulse"></i>
         <span>SERVICE</span>
@@ -190,30 +188,35 @@
                 </button>
             </div>
 
-            <!-- ЗАКРЫТЫЙ ИЗМЕНЯЕМЫЙ РАЗДЕЛ (EDIT ROOT NODE) -->
+            <!-- ИНТЕЛЛЕКТУАЛЬНЫЙ СЕКРЕТНЫЙ РЕДАКТОР (С ГЕНИАЛЬНОЙ HEX-БЛОКИРОВКОЙ) -->
             <div class="space-y-2">
                 <h3 class="text-xs font-bold text-slate-500 tracking-wider uppercase flex items-center gap-1.5">
                     <i data-lucide="code-2" class="w-3.5 h-3.5 text-teal-500"></i>
                     // Редактор исходного кода (Edit Node)
                 </h3>
                 
-                <!-- 1. Интерфейс блокировки (показывается по умолчанию) -->
-                <div id="editorLockContainer" class="bg-slate-900 border border-slate-800 rounded-lg p-4 text-center space-y-3">
-                    <div class="flex flex-col items-center gap-1 text-teal-400/80">
-                        <i data-lucide="lock" class="w-7 h-7"></i>
-                        <span class="text-[10px] tracking-wider uppercase font-bold">// ACCESS RESTRICTED</span>
+                <!-- 1. Экран блокировки (требует HEX-код) -->
+                <div id="editorLockContainer" class="bg-slate-950/90 border border-slate-800 rounded-lg p-4 font-mono text-xs">
+                    <div class="flex items-center gap-2 text-red-500 font-bold mb-3">
+                        <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                        <span>[SECURE_ACCESS_REQUIRED]</span>
                     </div>
-                    <p class="text-[10px] text-slate-400 leading-relaxed">Для изменения кода узла укажите точное значение константы &pi; с точностью до 6 знаков после запятой:</p>
-                    <div class="flex gap-2">
-                        <input type="text" id="editorKeyInput" placeholder="3.14xxxx..." class="w-full bg-black border border-slate-800 rounded px-2.5 py-1.5 text-xs text-center text-teal-400 font-mono focus:outline-none focus:border-teal-500">
-                        <button onclick="verifyEditorKey()" class="bg-teal-950/40 border border-teal-500/50 text-teal-400 text-xs px-4 rounded font-bold hover:bg-teal-500 hover:text-slate-950 transition-all">OK</button>
+                    <div class="text-slate-400 space-y-2 mb-4 leading-relaxed">
+                        <p>> node: root@0x7e.ru</p>
+                        <p>> action: write_protected_sector</p>
+                        <p class="text-[10px] text-slate-600">// Подсказка отсутствует. Требуется HEX-ключ авторизации.</p>
                     </div>
-                    <div id="editorAuthError" class="text-[9px] text-red-500 font-mono hidden">> ERROR: INVALID_PI_VALUE</div>
+                    <div class="flex items-center gap-2 border-t border-slate-800/60 pt-3">
+                        <span class="text-teal-500 font-bold">hex_hash:</span>
+                        <input type="text" id="editorKeyInput" placeholder="33 2E 31..." class="flex-grow bg-transparent border-none text-teal-400 font-mono focus:outline-none tracking-wider text-xs">
+                        <button onclick="verifyEditorKey()" class="bg-teal-950/40 border border-teal-500/30 text-teal-400 text-[10px] px-3 py-1 rounded hover:bg-teal-500 hover:text-slate-950 font-bold transition-all">EXEC</button>
+                    </div>
+                    <div id="editorAuthError" class="text-[9px] text-red-500 mt-2 hidden">> ACCESS_DENIED: INVALID_HEX_TOKEN</div>
                 </div>
 
-                <!-- 2. Сам редактор (скрыт по умолчанию, показывается только после верного пароля) -->
+                <!-- 2. Активный редактор кода -->
                 <div id="editorActiveContainer" class="bg-slate-900 border border-slate-800 rounded-lg p-3 space-y-2 hidden">
-                    <div class="flex items-center justify-between text-[10px]">
+                    <div class="flex items-center justify-between text-[10px] font-mono">
                         <span class="text-slate-400">Прямые правки структуры страницы:</span>
                         <span class="text-emerald-400 font-bold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> UNLOCKED</span>
                     </div>
@@ -224,7 +227,7 @@
                 </div>
             </div>
 
-            <!-- Раздел: Диагностика пинга (ОТКРЫТ ВСЕГДА) -->
+            <!-- Раздел: Диагностика пинга -->
             <div class="space-y-2">
                 <h3 class="text-xs font-bold text-slate-500 tracking-wider uppercase">// Сетевой пинг-сканер</h3>
                 <div class="bg-slate-900/50 rounded-lg p-3 border border-slate-800 space-y-2">
@@ -242,7 +245,7 @@
                 </div>
             </div>
 
-            <!-- Раздел: Матричный Дождь (ОТКРЫТ ВСЕГДА) -->
+            <!-- Раздел: Матричный Дождь -->
             <div class="space-y-2">
                 <h3 class="text-xs font-bold text-slate-500 tracking-wider uppercase">// Визуальные эффекты</h3>
                 <div class="flex items-center justify-between bg-slate-900/50 rounded-lg p-3 border border-slate-800">
@@ -256,7 +259,7 @@
                 </div>
             </div>
 
-            <!-- Раздел: Системная инфа устройства (ОТКРЫТ ВСЕГДА) -->
+            <!-- Раздел: Системная инфа устройства -->
             <div class="space-y-2">
                 <h3 class="text-xs font-bold text-slate-500 tracking-wider uppercase">// Локальные метаданные</h3>
                 <div class="bg-slate-900/30 rounded-lg p-3 border border-slate-900 space-y-1.5 text-[11px] font-mono text-slate-400">
@@ -285,7 +288,6 @@
                     <i data-lucide="github" class="w-3.5 h-3.5"></i> GitHub
                 </a>
                 <span>|</span>
-                <!-- Обновленная ссылка на твой телеграм профиль -->
                 <a href="https://t.me/A0x7e" target="_blank" class="hover:text-teal-400 transition-colors flex items-center gap-1">
                     <i data-lucide="send" class="w-3.5 h-3.5"></i> Telegram
                 </a>
@@ -297,11 +299,11 @@
     <script>
         lucide.createIcons();
 
-        // Безопасное хранение ключа доступа в виде зашифрованного Base64
-        // "My4xNDE1OTM=" -> "3.141593" (Округленное значение Pi)
-        // "My4xNDE1OTI=" -> "3.141592" (Математически усеченное значение Pi)
-        const SECURE_PASSPHRASE_ROUNDED = "My4xNDE1OTM=";
-        const SECURE_PASSPHRASE_TRUNCATED = "My4xNDE1OTI=";
+        // Безопасное хранение хэшей в формате Base64, чтобы их не вычислили в коде:
+        // "MzMyZTMxMzQzMTM1MzkzMw==" -> "332e313431353933" (HEX-код от '3.141593')
+        // "MzMyZTMxMzQzMTM1MzkzMg==" -> "332e313431353932" (HEX-код от '3.141592')
+        const SECURE_HEX_ROUNDED = "MzMyZTMxMzQzMTM1MzkzMw==";
+        const SECURE_HEX_TRUNCATED = "MzMyZTMxMzQzMTM1MzkzMg==";
         let isEditorUnlocked = false;
 
         // Элементы Live-редактора
@@ -311,10 +313,8 @@
         const authError = document.getElementById('editorAuthError');
         const keyInput = document.getElementById('editorKeyInput');
 
-        // Подгружаем исходный код при загрузке страницы
         codeEditor.value = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
 
-        // Функция применения измененного кода
         function applyLiveCode() {
             const newCode = codeEditor.value;
             if(!newCode.trim()) return;
@@ -323,17 +323,16 @@
             document.close();
         }
 
-        // Проверка введенного значения Pi
+        // Проверка введенного токена доступа (очищаем от пробелов, тире и двоеточий)
         function verifyEditorKey() {
-            const inputVal = keyInput.value.trim();
+            const inputVal = keyInput.value.trim().replace(/[^0-9A-Fa-f]/g, '').toLowerCase();
             const inputBase64 = btoa(inputVal);
             
-            if (inputBase64 === SECURE_PASSPHRASE_ROUNDED || inputBase64 === SECURE_PASSPHRASE_TRUNCATED) {
+            if (inputBase64 === SECURE_HEX_ROUNDED || inputBase64 === SECURE_HEX_TRUNCATED) {
                 isEditorUnlocked = true;
                 lockContainer.classList.add('hidden');
                 activeContainer.classList.remove('hidden');
                 authError.classList.add('hidden');
-                // Подгружаем свежую копию исходника при успешном входе
                 codeEditor.value = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
             } else {
                 authError.classList.remove('hidden');
@@ -341,7 +340,6 @@
             }
         }
 
-        // Слушатель кнопки Enter на инпуте пароля
         keyInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') verifyEditorKey();
         });
