@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -13,8 +12,23 @@
         .glow-teal { box-shadow: 0 0 20px rgba(20, 184, 166, 0.2); }
         .glow-text { text-shadow: 0 0 8px rgba(20, 184, 166, 0.5); }
         .grid-bg { background-image: linear-gradient(to right, #1f293715 1px, transparent 1px), linear-gradient(to bottom, #1f293715 1px, transparent 1px); }
-        .drawer-transition { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         
+        .terminal-container {
+            font-size: clamp(10px, 3.1vw, 13.5px);
+            line-height: 1.6;
+        }
+        
+        .tree-wrapper {
+            white-space: nowrap;
+            overflow-x: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .tree-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
         @keyframes glitch-red {
             0% { background-color: #090d16; }
             10% { background-color: #991b1b; }
@@ -28,7 +42,7 @@
 </head>
 <body id="body-root" class="text-slate-300 min-h-screen flex flex-col justify-between relative selection:bg-teal-500 selection:text-slate-900 overflow-x-hidden">
 
-    <!-- Задний фон: Матричный дождь (включается из сервисной панели) -->
+    <!-- Задний фон: Матричный дождь (активируется кнопкой на странице) -->
     <canvas id="matrixCanvas" class="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-1000 z-0"></canvas>
     
     <!-- Сетка на фоне -->
@@ -44,13 +58,7 @@
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
                     <span class="ml-2 font-mono">root@0x7e:~</span>
                 </div>
-                <div class="flex items-center space-x-3">
-                    <button onclick="openServiceWithAuth()" class="text-slate-500 hover:text-teal-400 transition-colors flex items-center gap-1">
-                        <i data-lucide="sliders" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Сервис</span>
-                    </button>
-                    <span class="text-slate-800">|</span>
-                    <div class="text-teal-500 font-bold glow-text animate-pulse">CORE NODE ONLINE</div>
-                </div>
+                <div class="text-teal-500 font-bold glow-text animate-pulse">CORE NODE ONLINE</div>
             </div>
             
             <div class="p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -70,27 +78,86 @@
             </div>
         </header>
 
-        <!-- СЕКЦИЯ: ТЕРМИНАЛЬНОЕ ДЕРЕВО ПОДДОМЕНОВ (ИНТЕГРАЦИЯ) -->
+        <!-- РАЗДЕЛ 1: СТРУКТУРА ПОДДОМЕНОВ -->
         <section class="mb-8">
             <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
                 <i data-lucide="network" class="w-5 h-5 text-teal-500"></i>
                 Структура поддоменов (/www)
             </h2>
             
-            <!-- Окно терминала с деревом -->
-            <div class="border border-slate-800 rounded-xl p-5 md:p-6 bg-black/90 font-mono text-xs md:text-sm shadow-xl relative overflow-hidden">
-                <div class="absolute top-2 right-3 text-[9px] text-slate-700 select-none">tree_v1.0</div>
+            <div class="border border-slate-800 rounded-xl p-4 sm:p-6 bg-black/95 font-mono shadow-xl relative overflow-hidden terminal-container">
+                <div class="absolute top-2 right-3 text-[9px] text-slate-700 select-none">tree_v1.3</div>
                 
                 <div class="text-slate-400 mb-2">alex@0x7e.ru:~$ <span class="text-white">tree --domains /www</span></div>
                 <div class="text-slate-200 font-bold mb-1">/www</div>
                 
-                <div class="space-y-1 text-slate-300 leading-relaxed">
+                <div class="tree-wrapper space-y-1 text-slate-300">
                     <div>├── <a href="https://about.0x7e.ru" class="text-teal-400 hover:text-teal-300 hover:underline font-bold transition-all">about.0x7e.ru</a> <span class="text-slate-500">------------> [ О себе ]</span></div>
                     <div>├── <a href="https://projects.0x7e.ru" class="text-teal-400 hover:text-teal-300 hover:underline font-bold transition-all">projects.0x7e.ru</a> <span class="text-slate-500">-------> [ Проекты ]</span></div>
                     <div>├── <a href="https://git.0x7e.ru" class="text-teal-400 hover:text-teal-300 hover:underline font-bold transition-all">git.0x7e.ru</a> <span class="text-slate-500">--------------> [ Git ]</span></div>
-                    <div>├── <a href="https://blog.0x7e.ru" class="text-teal-400 hover:text-teal-300 hover:underline font-bold transition-all">blog.0x7e.ru</a> <span class="text-slate-500">-------------> [ Блог ]</span></div>
+                    <div>├── <a href="https://blog.0x7e.ru" class="text-teal-400 hover:text-teal-300 hover:underline font-bold transition-all">blog.0x7e.ru</a> <span class="text-slate-500">------------─> [ Блог ]</span></div>
                     <div>├── <a href="https://clock.0x7e.ru" class="text-teal-400 hover:text-teal-300 hover:underline font-bold transition-all">clock.0x7e.ru</a> <span class="text-slate-500">------------> [ Часы ]</span></div>
                     <div>└── <a href="https://contacts.0x7e.ru" class="text-teal-400 hover:text-teal-300 hover:underline font-bold transition-all">contacts.0x7e.ru</a> <span class="text-slate-500">-------> [ Контакты ]</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- РАЗДЕЛ 2: СЛУЖЕБНАЯ КОНСОЛЬ УПРАВЛЕНИЯ (БЕЗ ПАРОЛЕЙ, НАПРЯМУЮ) -->
+        <section class="mb-8">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <i data-lucide="terminal" class="w-5 h-5 text-teal-500"></i>
+                Системная консоль управления
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Блок Пинг-теста -->
+                <div class="border border-slate-800 rounded-xl p-5 bg-slate-950/80 backdrop-blur-md flex flex-col justify-between">
+                    <div>
+                        <div class="text-[10px] text-teal-400 font-bold tracking-widest mb-2">// NETWORK SCANNER</div>
+                        <h3 class="text-sm font-bold text-white mb-3">Замер задержки узлов (Ping)</h3>
+                        
+                        <div class="bg-black/40 rounded-lg p-3 border border-slate-900 space-y-2 font-mono text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-slate-500">0x7e.ru:</span>
+                                <span id="pingMain" class="text-slate-400">offline</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-500">clock.0x7e.ru:</span>
+                                <span id="pingClock" class="text-slate-400">offline</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="startPingTest()" class="w-full mt-4 bg-teal-950/40 border border-teal-500/30 text-teal-400 py-2 rounded-lg text-xs font-bold hover:bg-teal-500 hover:text-slate-950 transition-all duration-300">
+                        ЗАПУСТИТЬ ТЕСТ СЕТИ
+                    </button>
+                </div>
+
+                <!-- Блок визуализации (Матрица и Сброс) -->
+                <div class="border border-slate-800 rounded-xl p-5 bg-slate-950/80 backdrop-blur-md flex flex-col justify-between">
+                    <div>
+                        <div class="text-[10px] text-teal-400 font-bold tracking-widest mb-2">// UTILITY CONSOLE</div>
+                        <h3 class="text-sm font-bold text-white mb-3">Визуализация и датчики</h3>
+                        
+                        <div class="bg-black/40 rounded-lg p-3 border border-slate-900 space-y-2 font-mono text-xs text-slate-400">
+                            <div class="flex justify-between">
+                                <span>Разрешение экрана:</span>
+                                <span id="localRes" class="text-white">...</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Заряд батареи:</span>
+                                <span id="localBattery" class="text-white">...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-2 mt-4">
+                        <button id="matrixToggle" onclick="toggleMatrixEffect()" class="bg-slate-900 border border-slate-800 text-slate-400 text-xs py-2 rounded-lg font-bold hover:border-teal-500 hover:text-teal-400 transition-all duration-300">
+                            ВКЛЮЧИТЬ МАТРИЦУ
+                        </button>
+                        <button onclick="triggerEmergencyReboot()" class="bg-red-950/20 border border-red-900/40 text-red-400 text-xs py-2 rounded-lg font-bold hover:bg-red-600 hover:text-white transition-all duration-300">
+                            СБРОС СИСТЕМЫ
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -148,92 +215,6 @@
         </section>
     </main>
 
-    <!-- ПЛАВАЮЩАЯ СЕРВИСНАЯ КНОПКА -->
-    <button onclick="openServiceWithAuth()" class="fixed bottom-6 right-6 z-40 bg-teal-950/80 text-teal-400 border border-teal-500/40 px-4 py-2.5 rounded-full flex items-center gap-2 text-xs font-bold tracking-widest hover:bg-teal-500 hover:text-slate-950 transition-all duration-300 shadow-lg hover:shadow-teal-500/20 backdrop-blur-md">
-        <i data-lucide="wrench" class="w-4 h-4"></i>
-        <span>SERVICE</span>
-    </button>
-
-    <!-- ОКНО ВВОДА ПАРОЛЯ (MODAL) -->
-    <div id="authModal" class="fixed inset-0 bg-slate-950/90 z-50 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="border border-slate-800 bg-slate-900/90 rounded-xl p-6 w-full max-w-sm text-center space-y-4 shadow-2xl">
-            <div class="flex flex-col items-center gap-1 text-teal-400">
-                <i data-lucide="lock" class="w-8 h-8 animate-pulse"></i>
-                <h3 class="text-sm font-bold tracking-wider">// ENTER ACCESS KEY</h3>
-            </div>
-            <input type="password" id="passwordInput" placeholder="Пароль администратора..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-center text-teal-400 focus:outline-none focus:border-teal-500 font-mono tracking-widest">
-            <div id="authError" class="text-[10px] text-red-500 font-mono hidden">> ACCESS_DENIED: INVALID_KEY</div>
-            <div class="flex gap-2">
-                <button onclick="closeAuthModal()" class="w-1/2 bg-slate-800 text-xs py-2 rounded text-slate-400 hover:bg-slate-700 transition-all">ОТМЕНА</button>
-                <button onclick="verifyPassword()" class="w-1/2 bg-teal-900/40 border border-teal-500/50 text-teal-400 text-xs py-2 rounded font-bold hover:bg-teal-500 hover:text-slate-950 transition-all">ВОЙТИ</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ВЫДВИЖНАЯ СЕРВИСНАЯ ПАНЕЛЬ -->
-    <div id="serviceDrawer" class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-slate-950/95 border-l border-slate-800 z-50 shadow-2xl p-6 flex flex-col justify-between drawer-transition translate-x-full backdrop-blur-md">
-        <div>
-            <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
-                <div class="flex items-center gap-2 text-teal-400 font-bold">
-                    <i data-lucide="terminal" class="w-5 h-5"></i>
-                    <span>0x7E // SERVICE CONSOLE</span>
-                </div>
-                <button onclick="closeServiceDrawer()" class="text-slate-500 hover:text-white transition-colors">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
-
-            <!-- Раздел 1: Диагностика пинга -->
-            <div class="space-y-4 mb-6">
-                <h3 class="text-xs font-bold text-slate-500 tracking-wider uppercase">// Сетевой пинг-сканер</h3>
-                <div class="bg-slate-900/80 rounded-lg p-4 border border-slate-800 space-y-2">
-                    <div class="flex justify-between items-center text-xs">
-                        <span>Ping main (0x7e.ru):</span>
-                        <span id="pingMain" class="font-mono text-slate-500">offline</span>
-                    </div>
-                    <div class="flex justify-between items-center text-xs">
-                        <span>Ping clock (clock.0x7e.ru):</span>
-                        <span id="pingClock" class="font-mono text-slate-500">offline</span>
-                    </div>
-                    <button onclick="startPingTest()" class="w-full mt-2 bg-teal-900/30 border border-teal-500/30 text-teal-400 rounded py-1.5 text-xs font-bold hover:bg-teal-500 hover:text-slate-950 transition-all">
-                        Запустить Ping-тест
-                    </button>
-                </div>
-            </div>
-
-            <!-- Раздел 2: Матричный Дождь -->
-            <div class="space-y-4 mb-6">
-                <h3 class="text-xs font-bold text-slate-500 tracking-wider uppercase">// Визуальные эффекты</h3>
-                <div class="flex items-center justify-between bg-slate-900/80 rounded-lg p-4 border border-slate-800">
-                    <div class="text-xs">
-                        <div class="font-bold">Фоновая матрица (Canvas)</div>
-                        <p class="text-[10px] text-slate-500">HEX дождь на фоне</p>
-                    </div>
-                    <button id="matrixToggle" onclick="toggleMatrixEffect()" class="bg-slate-800 border border-slate-700 text-slate-400 text-xs px-3 py-1.5 rounded font-bold hover:border-teal-500 hover:text-teal-400 transition-all">
-                        ВКЛЮЧИТЬ
-                    </button>
-                </div>
-            </div>
-
-            <!-- Раздел 3: Системная инфа устройства -->
-            <div class="space-y-4">
-                <h3 class="text-xs font-bold text-slate-500 tracking-wider uppercase">// Локальные метаданные</h3>
-                <div class="bg-slate-900/40 rounded-lg p-4 border border-slate-900 space-y-2 text-[11px] font-mono text-slate-400">
-                    <div>RESOLUTION: <span id="localRes" class="text-slate-200">1920x1080</span></div>
-                    <div>AGENT: <span id="localAgent" class="text-slate-200 truncate block">Mozilla</span></div>
-                    <div>BATTERY STATUS: <span id="localBattery" class="text-slate-200">Checking...</span></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="border-t border-slate-900 pt-6">
-            <button onclick="triggerEmergencyReboot()" class="w-full bg-red-950/30 border border-red-900 text-red-500 py-3 rounded-lg text-xs font-bold hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-2">
-                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                <span>СИМУЛИРОВАТЬ СБОЙ И REBOOT ЯДРА</span>
-            </button>
-        </div>
-    </div>
-
     <!-- Подвал -->
     <footer class="border-t border-slate-900 bg-slate-950/60 backdrop-blur-md py-5 z-10 text-xs text-slate-500 font-mono">
         <div class="max-w-4xl w-full mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
@@ -250,69 +231,11 @@
         </div>
     </footer>
 
+    <!-- JS Логика интерактивных инструментов -->
     <script>
         lucide.createIcons();
 
-        // 1. Хеш правильного пароля (SHA-256 от строки "0x7e_core")
-        const SECRET_HASH = "9550b074a3f5509bd2ccdd16bfa5cfefb46ba6b716b11782253051bc735954a1";
-        let isAuthenticated = false;
-
-        // Хеширующая функция
-        async function sha256(string) {
-            const utf8 = new TextEncoder().encode(string);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        // Логика аутентификации
-        function openServiceWithAuth() {
-            if (isAuthenticated) {
-                openServiceDrawer();
-            } else {
-                document.getElementById('authModal').classList.remove('hidden');
-                document.getElementById('authModal').classList.add('flex');
-                document.getElementById('passwordInput').focus();
-            }
-        }
-
-        function closeAuthModal() {
-            document.getElementById('authModal').classList.add('hidden');
-            document.getElementById('authModal').classList.remove('flex');
-            document.getElementById('passwordInput').value = '';
-            document.getElementById('authError').classList.add('hidden');
-        }
-
-        async function verifyPassword() {
-            const input = document.getElementById('passwordInput').value;
-            const inputHash = await sha256(input);
-            
-            if (inputHash === SECRET_HASH) {
-                isAuthenticated = true;
-                closeAuthModal();
-                openServiceDrawer();
-            } else {
-                document.getElementById('authError').classList.remove('hidden');
-                document.getElementById('passwordInput').value = '';
-            }
-        }
-
-        // Слушатель кнопки Enter на инпуте пароля
-        document.getElementById('passwordInput').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') verifyPassword();
-        });
-
-        // Открытие/закрытие панели
-        const drawer = document.getElementById('serviceDrawer');
-        function openServiceDrawer() {
-            drawer.classList.remove('translate-x-full');
-            updateDeviceStats();
-        }
-        function closeServiceDrawer() {
-            drawer.classList.add('translate-x-full');
-        }
-
-        // Конвертер
+        // 1. Конвертер
         const asciiInput = document.getElementById('asciiInput');
         const hexInput = document.getElementById('hexInput');
 
@@ -331,44 +254,51 @@
             try { asciiInput.value = new TextDecoder('utf-8').decode(new Uint8Array(bytes)); } catch (err) {}
         });
 
-        // Пинг тесты
+        // 2. Сетевой Пинг-тест
         function startPingTest() {
             const pMain = document.getElementById('pingMain');
             const pClock = document.getElementById('pingClock');
-            pMain.innerText = 'measuring...';
+            
+            pMain.innerText = 'опрос узла...';
             pMain.className = 'font-mono text-yellow-500 animate-pulse';
-            pClock.innerText = 'measuring...';
+            pClock.innerText = 'опрос узла...';
             pClock.className = 'font-mono text-yellow-500 animate-pulse';
 
             setTimeout(() => {
-                pMain.innerText = `${Math.floor(Math.random() * 25) + 8} ms`;
+                pMain.innerText = `${Math.floor(Math.random() * 18) + 6} ms [OK]`;
                 pMain.className = 'font-mono text-emerald-400 font-bold';
             }, 800);
+            
             setTimeout(() => {
-                pClock.innerText = `${Math.floor(Math.random() * 35) + 12} ms`;
+                pClock.innerText = `${Math.floor(Math.random() * 24) + 10} ms [OK]`;
                 pClock.className = 'font-mono text-emerald-400 font-bold';
             }, 1400);
         }
 
+        // 3. Снятие показаний устройства (Диагностика)
         function updateDeviceStats() {
-            document.getElementById('localRes').innerText = `${window.screen.width}x${window.screen.height}`;
-            document.getElementById('localAgent').innerText = navigator.userAgent;
+            document.getElementById('localRes').innerText = `${window.screen.width} x ${window.screen.height} px`;
+            
             if (navigator.getBattery) {
                 navigator.getBattery().then(b => {
-                    document.getElementById('localBattery').innerText = `${Math.round(b.level * 100)}% (${b.charging ? 'Charging' : 'Discharging'})`;
+                    document.getElementById('localBattery').innerText = `${Math.round(b.level * 100)}% (${b.charging ? 'Зарядка' : 'Автономно'})`;
                 });
-            } else { document.getElementById('localBattery').innerText = 'N/A'; }
+            } else {
+                document.getElementById('localBattery').innerText = 'Не поддерживается';
+            }
         }
+        updateDeviceStats();
 
+        // 4. Симуляция сбоя (Экстренный сброс)
         function triggerEmergencyReboot() {
             document.getElementById('body-root').classList.add('glitch-active');
-            closeServiceDrawer();
             setTimeout(() => {
                 document.body.innerHTML = `
                     <div class="flex flex-col items-center justify-center h-screen bg-slate-950 text-red-500 font-mono p-6">
                         <div class="max-w-md space-y-4">
                             <h1 class="text-2xl font-bold border-b border-red-900 pb-2">CRITICAL_SYSTEM_ALERT</h1>
                             <p class="text-xs">> CPU REGISTER DUMP: EAX=0x7E EBX=0x00FF4B ESP=0x7F2A3D</p>
+                            <p class="text-xs">> Flushing buffer tables...</p>
                             <p class="text-xs text-white animate-pulse">> REBOOTING SERVER NODE IN 3 SECONDS...</p>
                         </div>
                     </div>`;
@@ -376,12 +306,13 @@
             setTimeout(() => { window.location.reload(); }, 3500);
         }
 
-        // Матрица
+        // 5. Логика эффекта Матричного Дождя
         const canvas = document.getElementById('matrixCanvas');
         const ctx = canvas.getContext('2d');
         let matrixActive = false;
         let animationFrameId;
-        const matrixChars = "0123456789ABCDEF0x7E~<>[]{}";
+
+        const matrixChars = "0123456789ABCDEF0x7E~<>";
         const charArr = matrixChars.split("");
         const fontSize = 14;
         let columns, drops;
@@ -397,15 +328,22 @@
         function drawMatrix() {
             ctx.fillStyle = "rgba(9, 13, 22, 0.05)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#14b8a6";
+
+            ctx.fillStyle = "#14b8a6"; // Бирюзовое свечение
             ctx.font = fontSize + "px monospace";
+
             for (let i = 0; i < drops.length; i++) {
                 const text = charArr[Math.floor(Math.random() * charArr.length)];
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
                 drops[i]++;
             }
-            if (matrixActive) animationFrameId = requestAnimationFrame(drawMatrix);
+            if (matrixActive) {
+                animationFrameId = requestAnimationFrame(drawMatrix);
+            }
         }
 
         window.addEventListener('resize', () => { if (matrixActive) initMatrix(); });
@@ -413,198 +351,23 @@
         function toggleMatrixEffect() {
             matrixActive = !matrixActive;
             const btn = document.getElementById('matrixToggle');
+            
             if (matrixActive) {
-                canvas.classList.remove('opacity-0'); canvas.classList.add('opacity-30');
-                btn.innerText = 'ВЫКЛЮЧИТЬ';
-                btn.className = 'bg-teal-500 border border-teal-400 text-slate-950 text-xs px-3 py-1.5 rounded font-bold hover:bg-teal-600 transition-all';
-                initMatrix(); drawMatrix();
+                canvas.classList.remove('opacity-0');
+                canvas.classList.add('opacity-30');
+                btn.innerText = 'ВЫКЛЮЧИТЬ МАТРИЦУ';
+                btn.className = 'bg-teal-500 border border-teal-400 text-slate-950 text-xs py-2 rounded-lg font-bold hover:bg-teal-600 transition-all duration-300';
+                initMatrix();
+                drawMatrix();
             } else {
-                canvas.classList.add('opacity-0'); canvas.classList.remove('opacity-30');
-                btn.innerText = 'ВКЛЮЧИТЬ';
-                btn.className = 'bg-slate-800 border border-slate-700 text-slate-400 text-xs px-3 py-1.5 rounded font-bold hover:border-teal-500 hover:text-teal-400 transition-all';
+                canvas.classList.add('opacity-0');
+                canvas.classList.remove('opacity-30');
+                btn.innerText = 'ВКЛЮЧИТЬ МАТРИЦУ';
+                btn.className = 'bg-slate-900 border border-slate-800 text-slate-400 text-xs py-2 rounded-lg font-bold hover:border-teal-500 hover:text-teal-400 transition-all duration-300';
                 cancelAnimationFrame(animationFrameId);
                 setTimeout(() => { ctx.clearRect(0, 0, canvas.width, canvas.height); }, 1000);
             }
         }
-    </script>
-</body>
-</html>
-
-```                <i data-lucide="folder-git-2" class="w-5 h-5 text-teal-500"></i>
-                Актуальные проекты
-            </h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Проект 1 -->
-                <div class="border border-slate-800 rounded-xl p-6 bg-slate-950/40 hover:border-slate-700/80 transition-all duration-300 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-xs font-bold text-teal-400 tracking-wider">#FIRMWARE</span>
-                            <span class="flex h-2 w-2 relative">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
-                            </span>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Flipper One Replica</h3>
-                        <p class="text-sm text-slate-400 leading-relaxed mb-4">
-                            Портативное устройство на базе Linux SBC и сопроцессора для исследования радиоэфира и дебага низкоуровневых интерфейсов. Портирование Furi OS.
-                        </p>
-                    </div>
-                    <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-900">
-                        <span class="text-[10px] bg-slate-900 text-slate-400 px-2 py-1 rounded">RP2350</span>
-                        <span class="text-[10px] bg-slate-900 text-slate-400 px-2 py-1 rounded">C/C++</span>
-                        <span class="text-[10px] bg-slate-900 text-slate-400 px-2 py-1 rounded">ST7789 IPS</span>
-                    </div>
-                </div>
-
-                <!-- Проект 2 -->
-                <div class="border border-slate-800 rounded-xl p-6 bg-slate-950/40 hover:border-slate-700/80 transition-all duration-300 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-xs font-bold text-emerald-400 tracking-wider font-mono">#HARDWARE</span>
-                            <span class="text-xs text-slate-500">Done</span>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Coulomb Counter (INA226)</h3>
-                        <p class="text-sm text-slate-400 leading-relaxed mb-4">
-                            Высокоточный измеритель емкости аккумуляторов с цветным дисплеем. Разработка схемы питания, калибровка шунта и отрисовка кастомной печатной платы.
-                        </p>
-                    </div>
-                    <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-900">
-                        <span class="text-[10px] bg-slate-900 text-slate-400 px-2 py-1 rounded">KiCad</span>
-                        <span class="text-[10px] bg-slate-900 text-slate-400 px-2 py-1 rounded">STM32</span>
-                        <span class="text-[10px] bg-slate-900 text-slate-400 px-2 py-1 rounded">I2C</span>
-                    </div>
-                </div>
-
-                <!-- Проект 3 -->
-                <div class="border border-slate-800 rounded-xl p-6 bg-slate-950/40 hover:border-slate-700/80 transition-all duration-300 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-xs font-bold text-cyan-400 tracking-wider">#RF & NETWORKS</span>
-                            <span class="flex h-2 w-2 relative">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-                            </span>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Autonomous LoRa Node</h3>
-                        <p class="text-sm text-slate-400 leading-relaxed mb-4">
-                            Защищенный Mesh-модуль связи для интеграции в автономные системы. Мониторинг качества радиоэфира в реальном времени.
-                        </p>
-                    </div>
-                    <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-900">
-                        <span class="text-[10px] bg-slate-900 text-slate-400 px-2 py-1 rounded">Meshtastic</span>
-                        <span class="text-[10px] bg-slate-900 text-slate-400 px-2 py-1 rounded">LoRa 433/868</span>
-                        <span class="text-[10px] bg-slate-900 text-slate-400 px-2 py-1 rounded">RF-frontend</span>
-                    </div>
-                </div>
-
-                <!-- Проект 4 (Слот под будущий пет-проект) -->
-                <div class="border border-dashed border-slate-800 rounded-xl p-6 bg-slate-950/10 hover:border-teal-500/30 transition-all duration-300 flex flex-col items-center justify-center text-center group cursor-pointer min-h-[180px]">
-                    <i data-lucide="plus-circle" class="w-8 h-8 text-slate-600 group-hover:text-teal-400 transition-colors mb-2"></i>
-                    <h3 class="text-sm font-bold text-slate-500 group-hover:text-slate-300 transition-colors">Новый девайс в процессе...</h3>
-                    <p class="text-xs text-slate-600 group-hover:text-slate-500 transition-colors mt-1 max-w-[200px]">Тут скоро появится следующая сумасшедшая идея</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Навыки / Стек -->
-        <section class="border border-slate-800 rounded-xl p-6 mb-8 bg-slate-950/30">
-            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <i data-lucide="wrench" class="w-5 h-5 text-teal-500"></i>
-                Инструменты и технологии
-            </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-800/50">
-                    <div class="text-xs font-bold text-teal-400 mb-2">// HARDWARE</div>
-                    <ul class="text-xs text-slate-400 space-y-1">
-                        <li>• Разработка схем (KiCad)</li>
-                        <li>• Трассировка PCB (до 4 слоев)</li>
-                        <li>• Пайка SMD / BGA плат</li>
-                    </ul>
-                </div>
-                <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-800/50">
-                    <div class="text-xs font-bold text-teal-400 mb-2">// FIRMWARE</div>
-                    <ul class="text-xs text-slate-400 space-y-1">
-                        <li>• C/C++ (Bare-Metal, RTOS)</li>
-                        <li>• STM32Cube, ESP-IDF, SDK</li>
-                        <li>• Оптимизация потребления</li>
-                    </ul>
-                </div>
-                <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-800/50">
-                    <div class="text-xs font-bold text-teal-400 mb-2">// INTERFACES</div>
-                    <ul class="text-xs text-slate-400 space-y-1">
-                        <li>• SPI, I2C, UART, CAN, USB</li>
-                        <li>• Драйверы дисплеев и датчиков</li>
-                        <li>• Парсинг кастомных пакетов</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Подвал / Контакты -->
-    <footer class="border-t border-slate-800 bg-slate-950/80 backdrop-blur-md py-6 z-10">
-        <div class="max-w-4xl w-full mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-500">
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
-                <span>© 2026 AlexGyver2 // 0x7E Dev Hub</span>
-            </div>
-            
-            <div class="flex items-center space-x-4">
-                <a href="https://github.com/AlexGyver2" target="_blank" class="flex items-center gap-1 hover:text-white transition-colors">
-                    <i data-lucide="github" class="w-4 h-4"></i> GitHub
-                </a>
-                <span class="text-slate-800">|</span>
-                <!-- Замените твой_ник на ваш настоящий ник в Телеграме -->
-                <a href="https://t.me/A0x7e" target="_blank" class="flex items-center gap-1 hover:text-teal-400 transition-colors">
-                    <i data-lucide="send" class="w-4 h-4"></i> Telegram
-                </a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Логика интерактивного конвертера -->
-    <script>
-        // Инициализация красивых иконок Lucide
-        lucide.createIcons();
-
-        const asciiInput = document.getElementById('asciiInput');
-        const hexInput = document.getElementById('hexInput');
-        const copyFeedback = document.getElementById('copyFeedback');
-
-        // Конвертация из обычного текста в HEX-строку (UTF-8)
-        asciiInput.addEventListener('input', (e) => {
-            const text = e.target.value;
-            if (!text) {
-                hexInput.value = '';
-                return;
-            }
-            const encoder = new TextEncoder();
-            const view = encoder.encode(text);
-            const hexArray = Array.from(view).map(b => b.toString(16).toUpperCase().padStart(2, '0'));
-            hexInput.value = hexArray.join(' ');
-        });
-
-        // Конвертация из HEX-строки обратно в ASCII текст (с проверкой на валидность)
-        hexInput.addEventListener('input', (e) => {
-            let hex = e.target.value.replace(/[^0-9A-Fa-f]/g, '');
-            if (!hex) {
-                asciiInput.value = '';
-                return;
-            }
-            // Разбиваем строку на байты
-            const bytes = [];
-            for (let i = 0; i < hex.length; i += 2) {
-                bytes.push(parseInt(hex.substr(i, 2), 16));
-            }
-            try {
-                const decoder = new TextDecoder('utf-8');
-                asciiInput.value = decoder.decode(new Uint8Array(bytes));
-            } catch (err) {
-                // Игнорируем ошибки во время неполного ввода байт
-            }
-        });
     </script>
 </body>
 </html>
